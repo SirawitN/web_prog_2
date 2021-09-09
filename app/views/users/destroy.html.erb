@@ -1,0 +1,6 @@
+<h1>The user's been destroyed</h1>
+<p> Name : <%= @user.name %> </p>
+<p> Email : <%= @user.email %> </p>
+<p> birthday : <%= @user.birthday %> </p>
+
+<%= link_to 'Show users', users_path %>  <%= link_to 'Create this user again', "#{create_fast_users_path}?name=#{@user.name}&email=#{@user.email}" %>
