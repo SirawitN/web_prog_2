@@ -1,0 +1,12 @@
+<h1>WELCOME</h1>
+
+<% flash.each do |type, msg| %>
+	<div class="error">
+		<%= msg %>
+		<br><br>
+	</div>
+<% end %> 
+
+<%= render 'logInForm', user: @user %> 
+
+<%= link_to 'Create a new user ?', new_user_path %>

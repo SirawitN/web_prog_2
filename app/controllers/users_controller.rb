@@ -29,8 +29,8 @@ class UsersController < ApplicationController
         format.html { redirect_to @user, notice: "User was successfully created." }  #redirect to show the user
         format.json { render :show, status: :created, location: @user }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity } # if user requests in html format, use this.
+        format.json { render json: @user.errors, status: :unprocessable_entity } # otherwise 
       end
     end
   end
@@ -42,7 +42,7 @@ class UsersController < ApplicationController
         format.html { redirect_to @user, notice: "User was successfully updated." }
         format.json { render :show, status: :ok, location: @user }
       else
-        format.html { render :edit, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_entity }  #422 status
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
@@ -72,6 +72,24 @@ class UsersController < ApplicationController
 
   end
 
+  def log_in
+  end
+
+  def find_user
+    puts "email = #{params[:email]}, password = #{params[:password]}"
+    @user = User.find_by(email: params[:email], password: params[:password])
+    respond_to do |format|
+      if @user != nil
+        puts "Found"
+        format.html {redirect_to @user, notice: "Log in successfully."}
+      else 
+        puts "Not found"
+        flash.now[:alert] = "Log in failed, wrong email or password !!"
+        format.html {render :log_in}   #<<-------------------- 
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
@@ -80,10 +98,11 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:name, :email, :birthday, :address, :postal_code)  #<<-------  security
+      params.require(:user).permit(:name, :email, :birthday, :address, :postal_code, :password)  #<<-------  security
     end
 
     def fast_user_params
       return {name: params[:name], email: params[:email]}
     end
+
 end
