@@ -6,8 +6,9 @@ Rails.application.routes.draw do
     end
   end
 
-  get '/main', to: 'users#log_in'
-  post '/main', to: 'users#find_user'
+  get '/main', to: 'main#log_in'
+  post '/main', to: 'main#find_user'
+  get '/main/:user_id', to: 'main#feed', as: "user_id"
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end

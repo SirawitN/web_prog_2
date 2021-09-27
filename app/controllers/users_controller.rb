@@ -72,24 +72,6 @@ class UsersController < ApplicationController
 
   end
 
-  def log_in
-  end
-
-  def find_user
-    puts "email = #{params[:email]}, password = #{params[:password]}"
-    @user = User.find_by(email: params[:email], password: params[:password])
-    respond_to do |format|
-      if @user != nil
-        puts "Found"
-        format.html {redirect_to @user, notice: "Log in successfully."}
-      else 
-        puts "Not found"
-        flash.now[:alert] = "Log in failed, wrong email or password !!"
-        format.html {render :log_in}   #<<-------------------- 
-      end
-    end
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user

@@ -2,4 +2,5 @@
 
 <%= render 'form', user: @user %>  <!-- pass the user to form -->
 
-<%= link_to 'Back', @user %>
+<%= link_to 'Show', @user %>
+<%= link_to 'Back', user_id_path(@user) %>

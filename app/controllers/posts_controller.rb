@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   before_action :set_post, only: %i[ show edit update destroy ]
-  before_action :set_user # <<---------
+  before_action :set_user, only: %i[ new ] # <<---------
 
   # GET /posts or /posts.json
   def index
@@ -14,9 +14,7 @@ class PostsController < ApplicationController
   # GET /posts/new
   def new
     @post = Post.new
-    if @user != nil
-      @post.user_id = @user.id   # <<---------
-    end
+    @post.user_id = @user.id rescue nil   # <<---------
   end
 
   # GET /posts/1/edit
@@ -55,7 +53,7 @@ class PostsController < ApplicationController
   def destroy
     @post.destroy
     respond_to do |format|
-      format.html { redirect_to @user, notice: "Post was successfully destroyed." }  # <<---------
+      format.html { redirect_to user_id_path(@post.user_id), notice: "Post was successfully destroyed." }  # <<---------
       format.json { head :no_content }
     end
   end
@@ -67,14 +65,7 @@ class PostsController < ApplicationController
     end
 
     def set_user   # <<---------------------
-      puts "#{params[:user_id]}"
-      if !!params[:user_id]
-        @user = User.find(params[:user_id])
-      elsif @post != nil && !!@post.user_id  
-        @user = User.find(@post.user_id)
-      else 
-        @user = nil
-      end
+        @user = User.find(params[:user_id]) rescue nil
     end
 
     # Only allow a list of trusted parameters through.
