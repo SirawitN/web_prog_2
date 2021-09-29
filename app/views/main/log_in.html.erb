@@ -1,11 +1,12 @@
 <h1>WELCOME</h1>
+<p class="alert"><%= alert %></p>
 
-<% flash.each do |type, msg| %>
+<!-- <% flash.each do |type, msg| %>
 	<div class="error">
 		<%= msg %>
 		<br><br>
 	</div>
-<% end %> 
+<% end %>  -->
 
 <%= render 'logInForm', user: @user %> 
 

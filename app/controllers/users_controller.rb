@@ -1,5 +1,16 @@
 class UsersController < ApplicationController
+  include MainConcern
+
   before_action :set_user, only: %i[ show edit update destroy ] #before function is called before doing any function
+  before_action :is_logged_in, only: %i[ show edit destroy ]
+  before_action only: %i[ show edit destroy ] do
+    if @user
+      is_the_right_user(@user.id)
+    else
+      is_the_right_user(-1)
+    end
+  end
+
   #after action
 
   # GET /users or /users.json
@@ -51,6 +62,7 @@ class UsersController < ApplicationController
   # DELETE /users/1 or /users/1.json
   def destroy
     @user.destroy
+    session[:user_id] = nil
     # respond_to do |format|
     #   format.html { redirect_to users_url, notice: "User was successfully destroyed." }
     #   format.json { head :no_content }
@@ -75,7 +87,7 @@ class UsersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      @user = User.find(params[:id])
+      @user = User.find(params[:id]) rescue nil
     end
 
     # Only allow a list of trusted parameters through.
@@ -86,5 +98,4 @@ class UsersController < ApplicationController
     def fast_user_params
       return {name: params[:name], email: params[:email]}
     end
-
 end

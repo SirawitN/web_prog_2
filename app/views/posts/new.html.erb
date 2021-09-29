@@ -3,6 +3,6 @@
 <%= render 'form', post: @post %>
 
 <%= link_to_if @post.user_id == nil, "Back", posts_path do
-		link_to 'Back', user_id_path(@post.user_id) 
+		link_to 'Back', feed_path(@post.user_id) 
 	end 
 %>

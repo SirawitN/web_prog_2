@@ -1,6 +1,8 @@
 class PostsController < ApplicationController
+  include MainConcern
+
   before_action :set_post, only: %i[ show edit update destroy ]
-  before_action :set_user, only: %i[ new ] # <<---------
+  before_action :is_logged_in, only: %i[ new show edit destroy ]
 
   # GET /posts or /posts.json
   def index
@@ -14,7 +16,7 @@ class PostsController < ApplicationController
   # GET /posts/new
   def new
     @post = Post.new
-    @post.user_id = @user.id rescue nil   # <<---------
+    @post.user_id = session[:user_id]   # <<---------
   end
 
   # GET /posts/1/edit
@@ -26,7 +28,7 @@ class PostsController < ApplicationController
     @post = Post.new(post_params)
 
     respond_to do |format|
-      if @post.save
+      if @post.valid_user_id(session[:user_id]) && @post.save
         format.html { redirect_to @post, notice: "Post was successfully created." }  # <<---------
         format.json { render :show, status: :created, location: @post }
       else
@@ -38,8 +40,14 @@ class PostsController < ApplicationController
 
   # PATCH/PUT /posts/1 or /posts/1.json
   def update
+
+    checkID = post_params[:user_id].to_i rescue nil
+    if @post.valid_user_id(checkID)
+      @post.valid_user_id(session[:user_id])
+    end
+
     respond_to do |format|
-      if @post.update(post_params)
+      if !@post.errors.any? && @post.update(post_params)
         format.html { redirect_to @post, notice: "Post was successfully updated." }  # <<---------
         format.json { render :show, status: :ok, location: @post }
       else
@@ -51,10 +59,17 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1 or /posts/1.json
   def destroy
-    @post.destroy
+    @post.valid_user_id(session[:user_id])
+
+    
     respond_to do |format|
-      format.html { redirect_to user_id_path(@post.user_id), notice: "Post was successfully destroyed." }  # <<---------
-      format.json { head :no_content }
+      if !@post.errors.any? 
+        @post.destroy
+        format.html { redirect_to feed_path(@post.user_id), notice: "Post was successfully destroyed." }  # <<---------
+        format.json { head :no_content }
+      else 
+        format.html { redirect_to posts_path, alert: "You have no permission to perform this action."}
+      end  
     end
   end
 
@@ -62,10 +77,6 @@ class PostsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_post
       @post = Post.find(params[:id])
-    end
-
-    def set_user   # <<---------------------
-        @user = User.find(params[:user_id]) rescue nil
     end
 
     # Only allow a list of trusted parameters through.
